@@ -1,0 +1,38 @@
+{
+  "name": "mantle",
+  "version": "0.0.0",
+  "description": "Centralized data collection and management of tentacle gateways",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joyja/mantle.git"
+  },
+  "author": "James A. Joy, PE",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/joyja/mantle/issues"
+  },
+  "homepage": "https://github.com/joyja/mantle#readme",
+  "dependencies": {
+    "graphql-yoga": "^1.18.3"
+  },
+  "devDependencies": {
+    "coveralls": "^3.1.0",
+    "eslint": "^7.0.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-jest": "^23.13.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^26.0.1",
+    "jest-watch-select-projects": "^2.0.0",
+    "jest-watch-typeahead": "^0.6.0",
+    "nodemon": "^2.0.4",
+    "prettier": "^2.0.5"
+  }
+}
