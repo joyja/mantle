@@ -1,0 +1,7 @@
+"""Used to deliver timestamp values."""
+scalar DateTime
+
+"""Read only queries"""
+type Query {
+  info: String!
+}

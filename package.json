@@ -2,9 +2,16 @@
   "name": "mantle",
   "version": "0.0.0",
   "description": "Centralized data collection and management of tentacle gateways",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "dev": "cross-env NODE_ENV=development nodemon ./src/index.js -e js,graphql --watch src",
+    "start": "cross-env node ./src/index.js",
+    "test": "jest --watchAll",
+    "test:ci": "jest",
+    "test:coverage": "jest --coverage",
+    "fix": "eslint --ext .js,.vue --fix --ignore-path .gitignore .",
+    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -17,9 +24,17 @@
   },
   "homepage": "https://github.com/joyja/mantle#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cross-env": "^7.0.2",
+    "date-fns": "^2.14.0",
+    "date-fns-timezone": "^0.1.4",
+    "express": "^4.17.1",
     "graphql-yoga": "^1.18.3",
+    "jsonwebtoken": "^8.5.1",
     "make-promises-safe": "^5.1.0",
+    "mqtt": "^4.1.0",
     "sqlite3": "^4.2.0",
+    "tentacle-sparkplug-client": "0.0.5",
     "winston": "^3.2.1"
   },
   "devDependencies": {
