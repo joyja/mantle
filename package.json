@@ -1,6 +1,6 @@
 {
   "name": "@joyja/mantle",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Centralized data collection and management of tentacle gateways",
   "main": "src/index.js",
   "scripts": {
