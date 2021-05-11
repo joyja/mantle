@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
+const http = require('http')
 const path = require('path')
 const sqlite3 = require('sqlite3').verbose()
-const { GraphQLServer, PubSub } = require('graphql-yoga')
+const express = require('express')
+const { ApolloServer, PubSub, gql } = require('apollo-server-express')
 const resolvers = require('./resolvers')
 const EdgeNode = require('./edgenode')
 const { executeQuery } = require('./database/model')
@@ -12,10 +14,22 @@ const mqttClient = require('./mqtt')
 
 const desiredUserVersion = 1
 
+const app = express()
+
+app.use(express.json())
+
 let db = undefined
 let httpServer = undefined
-let server = undefined
+let graphqlServer = undefined
+let listenHost = process.env.MANTLE_HOST || 'localhost'
+let listenPort = process.env.MANTLE_PORT || 4000
+
 const start = async function (dbFilename) {
+  const dir = './database'
+
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir)
+  }
   let fileExisted = false
   // Create database
   if (dbFilename === `:memory:`) {
@@ -35,8 +49,10 @@ const start = async function (dbFilename) {
     })
   }
   const pubsub = new PubSub()
-  server = new GraphQLServer({
-    typeDefs: path.join(__dirname, '/schema.graphql'),
+  graphqlServer = new ApolloServer({
+    typeDefs: gql`
+      ${fs.readFileSync(__dirname.concat('/schema.graphql'), 'utf8')}
+    `,
     resolvers,
     context: (req) => ({
       ...req,
@@ -44,10 +60,14 @@ const start = async function (dbFilename) {
       db,
     }),
   })
+  graphqlServer.applyMiddleware({ app, path: '/' })
+
+  httpServer = http.createServer(app)
+  graphqlServer.installSubscriptionHandlers(httpServer)
 
   await new Promise(async (resolve, reject) => {
-    httpServer = await server.start(async () => {
-      const context = server.context()
+    httpServer.listen(listenPort, listenHost, async () => {
+      const context = graphqlServer.context()
       await executeQuery(context.db, 'PRAGMA foreign_keys = ON', [], true)
       const { user_version: userVersion } = await executeQuery(
         context.db,
@@ -72,7 +92,7 @@ const start = async function (dbFilename) {
   })
 
   const mqtt = new mqttClient({
-    serverUrl: 'tcp://jar3.internal1.jarautomation.io:1883',
+    serverUrl: 'tcp://192.168.50.77:1883',
     username: '',
     password: '',
     primaryHostId: `mantle1`,
