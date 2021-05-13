@@ -8,6 +8,8 @@ module.exports = {
       },
       env_production: {
         NODE_ENV: 'production',
+        MANTLE_HOST: '0.0.0.0',
+        MANTLE_PORT: 4000
       },
     },
   ],
