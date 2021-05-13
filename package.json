@@ -7,7 +7,8 @@
     "test": "jest --watchAll",
     "dev": "NODE_ENV=development nodemon ./index.js -e js,graphql --watch src",
     "test:ci": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
