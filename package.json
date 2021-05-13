@@ -26,6 +26,7 @@
     "date-fns": "^2.21.3",
     "date-fns-timezone": "^0.1.4",
     "express": "^4.17.1",
+    "graphql": "^15.5.0",
     "graphql-tag": "^2.12.4",
     "jsonwebtoken": "^8.5.1",
     "make-promises-safe": "^5.1.0",
