@@ -63,6 +63,8 @@ const start = async function (dbFilename) {
       pubsub,
       db,
     }),
+    introspection: true,
+    playground: true,
   })
   graphqlServer.applyMiddleware({ app, path: '/' })
 
