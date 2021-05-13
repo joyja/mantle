@@ -56,7 +56,7 @@ class EdgeNode extends Model {
       metric.stale = true
     })
     for (const metric of payload.metrics) {
-      await device.addOrUpdateMetric(metric)
+      await device.createOrUpdateMetric(metric)
     }
   }
   get group() {
@@ -89,6 +89,11 @@ class EdgeNode extends Model {
   get createdOn() {
     this.checkInit()
     return fromUnixTime(this._createdOn)
+  }
+  findDeviceByName(name) {
+    return this.devices.find((device) => {
+      return name === device.name
+    })
   }
   get devices() {
     this.checkInit()
@@ -141,7 +146,7 @@ class EdgeDevice extends Model {
     this._description = result.description
     this._createdOn = result.createdOn
   }
-  async addOrUpdateMetric({ name, type, value, timestamp }) {
+  async createOrUpdateMetric({ name, type, value, timestamp }) {
     this.checkInit()
     let metric = this.metrics.find((metric) => {
       return metric.name === name

@@ -39,10 +39,10 @@ const start = async function (dbFilename) {
       }
     })
   } else {
-    if (fs.existsSync(`./${dbFilename}.db`)) {
+    if (fs.existsSync(`${dir}/${dbFilename}.db`)) {
       fileExisted = true
     }
-    db = new sqlite3.cached.Database(`./${dbFilename}.db`, (error) => {
+    db = new sqlite3.cached.Database(`${dir}/${dbFilename}.db`, (error) => {
       if (error) {
         throw error
       }
@@ -56,6 +56,7 @@ const start = async function (dbFilename) {
     resolvers,
     context: (req) => ({
       ...req,
+      EdgeNodes: EdgeNode.instances,
       pubsub,
       db,
     }),
@@ -81,8 +82,8 @@ const start = async function (dbFilename) {
         userVersion !== desiredUserVersion
       ) {
         fs.copyFileSync(
-          `./${dbFilename}.db`,
-          `./${dbFilename}-backup-${new Date().toISOString()}.db`
+          `${dir}/${dbFilename}.db`,
+          `${dir}/${dbFilename}-backup-${new Date().toISOString()}.db`
         )
       }
       await EdgeNode.initialize(context.db, context.pubusub)
@@ -98,12 +99,33 @@ const start = async function (dbFilename) {
     primaryHostId: `mantle1`,
   })
 
+  mqtt.on('ddata', async ({ topic, groupId, node, name, payload }) => {
+    let edgenode = EdgeNode.findByGroupIdAndName(groupId, node)
+    if (edgenode) {
+      // console.log(
+      //   `Found edge node ${edgenode.id} with group: ${groupId} and name: ${name}`
+      // )
+      let edgedevice = edgenode.findDeviceByName(name)
+      if (edgedevice) {
+        await Promise.all(
+          payload.metrics.map((metric) => {
+            return edgedevice.createOrUpdateMetric(metric)
+          })
+        )
+      } else {
+        console.log(`Detected data for device that doesn't exist on node.`)
+      }
+    } else {
+      console.log(`Detected data for node that doesn't exist`)
+    }
+  })
+
   mqtt.on('nbirth', async ({ topic, groupId, name, payload }) => {
     let edgenode = EdgeNode.findByGroupIdAndName(groupId, name)
     if (edgenode) {
-      console.log(
-        `Found edge node ${edgenode.id} with group: ${groupId} and name: ${name}`
-      )
+      // console.log(
+      //   `Found edge node ${edgenode.id} with group: ${groupId} and name: ${name}`
+      // )
     } else {
       edgenode = await EdgeNode.create(groupId, name, '')
       console.log(

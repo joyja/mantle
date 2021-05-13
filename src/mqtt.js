@@ -141,7 +141,15 @@ class MqttClient extends EventEmitter {
       this.messageAlert('arrived', topic, payload)
       // Split the topic up into tokens
       splitTopic = topic.split('/')
-      if (splitTopic[0] === this.version && splitTopic[2] === 'NBIRTH') {
+      if (splitTopic[0] === this.version && splitTopic[2] === 'DDATA') {
+        this.emit('ddata', {
+          topic,
+          groupId: splitTopic[1],
+          node: splitTopic[3],
+          name: splitTopic[4],
+          payload,
+        })
+      } else if (splitTopic[0] === this.version && splitTopic[2] === 'NBIRTH') {
         this.emit('nbirth', {
           topic,
           groupId: splitTopic[1],
@@ -181,7 +189,7 @@ class MqttClient extends EventEmitter {
   }
   messageAlert(alert, topic, payload) {
     logger.debug(`Message ${alert}`)
-    logger.debug(` topic: ${topic}`)
+    logger.debug(`topic: ${topic}`)
     logger.debug(`payload: ${JSON.stringify(payload)}`)
   }
   compressPayload(payload, options) {

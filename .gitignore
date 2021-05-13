@@ -90,5 +90,5 @@ sw.*
 *.swp
 
 # production database
-/spread-edge*.db
-/tentacle-edge*.db
+/mantle*.db
+/database*

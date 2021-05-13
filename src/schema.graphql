@@ -1,7 +1,34 @@
 """Used to deliver timestamp values."""
 scalar DateTime
 
+type EdgeNode {
+  group: String!
+  name: String!
+  description: String
+  createdOn: DateTime!
+  devices: [EdgeDevice!]!
+}
+
+type EdgeDevice {
+  edgenode: EdgeNode!
+  name: String!
+  description: String
+  createdOn: DateTime!
+  metrics: [EdgeDeviceMetric!]!
+}
+
+type EdgeDeviceMetric {
+  edgedevice: EdgeDevice!
+  name: String!
+  description: String
+  datatype: String!
+  value: String!
+  timestamp: DateTime!
+  createdOn: DateTime!
+}
+
 """Read only queries"""
 type Query {
+  EdgeNodes: [EdgeNode!]!
   info: String!
 }
