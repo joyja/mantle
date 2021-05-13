@@ -93,9 +93,9 @@ const start = async function (dbFilename) {
   })
 
   const mqtt = new mqttClient({
-    serverUrl: 'tcp://192.168.50.77:1883',
-    username: '',
-    password: '',
+    serverUrl: 'tcp://mosquitto-1.lxd:1883',
+    username: 'joyja',
+    password: 'pLLJtj1txGZ4JdrrF2OS',
     primaryHostId: `mantle1`,
   })
 
