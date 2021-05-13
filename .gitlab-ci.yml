@@ -1,0 +1,11 @@
+image: node:14.16.1
+
+stages:
+- deploy
+
+deployToMantle1:
+  only:
+  - master
+  stage: deploy
+  script:
+  - bash deploy/deploy-production.sh
