@@ -54,6 +54,9 @@ const start = async function (dbFilename) {
       ${fs.readFileSync(__dirname.concat('/schema.graphql'), 'utf8')}
     `,
     resolvers,
+    subscriptions: {
+      path: '/',
+    },
     context: (req) => ({
       ...req,
       EdgeNodes: EdgeNode.instances,
