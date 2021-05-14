@@ -22,7 +22,7 @@ type EdgeDeviceMetric {
   name: String!
   description: String
   datatype: String!
-  value: String!
+  value: String
   timestamp: DateTime!
   createdOn: DateTime!
 }
