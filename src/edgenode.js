@@ -1,5 +1,6 @@
 const { Model } = require('./database')
 const getUnixTime = require('date-fns/getUnixTime')
+const fromUnixTime = require('date-fns/fromUnixTime')
 
 class EdgeNode extends Model {
   static async initialize(db, pubsub) {
