@@ -29,6 +29,6 @@ type EdgeDeviceMetric {
 
 """Read only queries"""
 type Query {
-  EdgeNodes: [EdgeNode!]!
+  edgeNodes: [EdgeNode!]!
   info: String!
 }
