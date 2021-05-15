@@ -168,7 +168,6 @@ const start = async function (dbFilename) {
     // console.log(name)
     // console.log(payload)
   })
-
   mqtt.publishHostOnline()
 
   process.on('SIGINT', async () => {

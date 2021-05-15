@@ -154,9 +154,12 @@ class EdgeDevice extends Model {
     })
     if (metric) {
       await metric.setDatatype(type)
+      if (metric.value !== value) {
+        console.log(`${metric.name}: ${metric.value}`)
+        await metric.log()
+      }
       await metric.setValue(value)
       await metric.setTimestamp(timestamp)
-      // await metric.log()
     } else {
       metric = await EdgeDeviceMetric.create(
         this.id,
@@ -166,7 +169,7 @@ class EdgeDevice extends Model {
         value,
         timestamp
       )
-      // metric.log()
+      metric.log()
     }
   }
   get edgenode() {
