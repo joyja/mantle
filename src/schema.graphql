@@ -27,8 +27,18 @@ type EdgeDeviceMetric {
   createdOn: DateTime!
 }
 
+type EdgeDeviceMetricHistory {
+  edgedecicemetric: EdgeDeviceMetric!
+  value: String!
+  timestamp: DateTime!
+}
+
 """Read only queries"""
 type Query {
   edgeNodes: [EdgeNode!]!
   info: String!
+}
+
+type Mutation {
+  edgeDeviceMetricHistory(nodeName: String!, deviceName: String!, metricName: String!): [EdgeDeviceMetricHistory!]!
 }

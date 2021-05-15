@@ -98,7 +98,10 @@ const start = async function (dbFilename) {
   })
 
   const mqtt = new mqttClient({
-    serverUrl: 'tcp://mosquitto-1.lxd:1883',
+    serverUrl:
+      process.env.NODE_ENV === 'production'
+        ? 'tcp://mosquitto-1.lxd:1883'
+        : 'ssl://mosquitto.jarautomation.io:37010',
     username: 'joyja',
     password: 'pLLJtj1txGZ4JdrrF2OS',
     primaryHostId: `mantle1`,

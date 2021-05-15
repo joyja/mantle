@@ -153,9 +153,10 @@ class EdgeDevice extends Model {
       return metric.name === name
     })
     if (metric) {
-      metric.setDatatype(type)
-      metric.setValue(value)
-      metric.setTimestamp(timestamp)
+      await metric.setDatatype(type)
+      await metric.setValue(value)
+      await metric.setTimestamp(timestamp)
+      await metric.log()
     } else {
       metric = await EdgeDeviceMetric.create(
         this.id,
@@ -165,6 +166,7 @@ class EdgeDevice extends Model {
         value,
         timestamp
       )
+      metric.log()
     }
   }
   get edgenode() {
@@ -353,6 +355,19 @@ EdgeNodeInfo.fields = [
 ]
 
 class EdgeDeviceMetric extends Model {
+  static async createTable() {
+    const result = await super.createTable()
+    let sql = `CREATE TABLE IF NOT EXISTS "edgedevicemetrichistory" (`
+    sql = `${sql} "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE`
+    sql = `${sql}, "edgedevicemetric" INTEGER`
+    sql = `${sql}, "value" TEXT`
+    sql = `${sql}, "timestamp" INTEGER`
+    sql = `${sql}, FOREIGN KEY("edgedevicemetric") REFERENCES "edgedevicemetric"("id") ON DELETE CASCADE);`
+    await this.executeUpdate(sql)
+    sql = `CREATE INDEX IF NOT EXISTS idx_edgedevicemetrichistory_edgedevicemetric ON edgedevicemetrichistory (edgedevicemetric);`
+    await this.executeUpdate(sql)
+    return result
+  }
   static create(edgedevice, name, description, datatype, value, timestamp) {
     const createdOn = getUnixTime(new Date())
     const fields = {
@@ -376,6 +391,18 @@ class EdgeDeviceMetric extends Model {
     this._timestamp = result.timestamp
     this._createdOn = result.createdOn
     this.stale = false
+  }
+  async log() {
+    let sql = `INSERT INTO edgedevicemetrichistory (edgedevicemetric, value, timestamp) VALUES (?, ?, ?)`
+    let params = [this.id, this.value, this.timestamp]
+    await this.constructor.executeUpdate(sql, params)
+  }
+  async getHistory() {
+    let sql = `SELECT * FROM edgedevicemetrichistory WHERE edgedevicemetric=? AND timestamp > ?`
+    let params = [this.id, getUnixTime(new Date()) - 300]
+    const result = await this.constructor.executeQuery(sql, params)
+    console.log(result)
+    return result
   }
   get edgedevice() {
     this.checkInit()
