@@ -166,7 +166,7 @@ class EdgeDevice extends Model {
         value,
         timestamp
       )
-      metric.log()
+      // metric.log()
     }
   }
   get edgenode() {
