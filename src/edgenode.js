@@ -156,7 +156,7 @@ class EdgeDevice extends Model {
       await metric.setDatatype(type)
       await metric.setValue(value)
       await metric.setTimestamp(timestamp)
-      await metric.log()
+      // await metric.log()
     } else {
       metric = await EdgeDeviceMetric.create(
         this.id,
