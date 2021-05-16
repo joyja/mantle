@@ -404,7 +404,12 @@ class EdgeDeviceMetric extends Model {
     let sql = `SELECT * FROM edgedevicemetrichistory WHERE edgedevicemetric=? AND timestamp > ?`
     let params = [this.id, getUnixTime(new Date()) - 300]
     const result = await this.constructor.executeQuery(sql, params)
-    return result
+    return result.map((row) => {
+      return {
+        ...row,
+        timestamp: fromUnixTime(row.timestamp),
+      }
+    })
   }
   get edgedevice() {
     this.checkInit()
@@ -452,7 +457,7 @@ class EdgeDeviceMetric extends Model {
   }
   get timestamp() {
     this.checkInit()
-    return this._timestamp
+    return fromUnixTime(this._timestamp)
   }
   setTimestamp(value) {
     return this.update(this.id, 'timestamp', value).then(
