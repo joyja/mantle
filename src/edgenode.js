@@ -416,7 +416,6 @@ class EdgeDeviceMetric extends Model {
   }
   async getHistory() {
     let sql = `SELECT * FROM edgedevicemetrichistory WHERE edgedevicemetric=? AND timestamp > ?`
-    console.log(getUnixTime(new Date()))
     let params = [this.id, getUnixTime(new Date()) - 120]
     const result = await this.constructor.executeQuery(sql, params)
     return result
