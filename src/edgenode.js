@@ -153,12 +153,20 @@ class EdgeDevice extends Model {
       return metric.name === name
     })
     if (metric) {
+      let isLoggable
+      if (metric.datatype === 'Float') {
+        isLoggable =
+          parseFloat(value) > parseFloat(metric.value) + 1 ||
+          parseFloat(value) < parseFloat(metric.value) - 1
+      } else {
+        isLoggable = value !== metric.value
+      }
       await metric.setDatatype(type)
-      // console.log(`${metric.name}: ${metric.value}`)
-      if (metric.value !== value) {
+      await metric.setValue(value)
+      if (isLoggable) {
+        console.log(`${metric.name}: ${metric.value}`)
         await metric.log()
       }
-      await metric.setValue(value)
       await metric.setTimestamp(timestamp)
     } else {
       metric = await EdgeDeviceMetric.create(
