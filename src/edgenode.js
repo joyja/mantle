@@ -161,11 +161,17 @@ class EdgeDevice extends Model {
       } else {
         isLoggable = value !== metric.value
       }
+      if (isLoggable && parseInt(timestamp) - parseInt(metric.timestamp) > 10) {
+        console.log(
+          `old ${metric.name}: ${metric.value} - ${metric.timestamp} !== ${timestamp}`
+        )
+        await metric.log()
+      }
       await metric.setDatatype(type)
       await metric.setValue(value)
       await metric.setTimestamp(timestamp)
       if (isLoggable) {
-        // console.log(`${metric.name}: ${metric.value} - ${metric.timestamp}`)
+        console.log(`new ${metric.name}: ${metric.value} - ${metric.timestamp}`)
         await metric.log()
       }
     } else {
