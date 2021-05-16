@@ -163,11 +163,11 @@ class EdgeDevice extends Model {
       }
       await metric.setDatatype(type)
       await metric.setValue(value)
+      await metric.setTimestamp(timestamp)
       if (isLoggable) {
-        console.log(`${metric.name}: ${metric.value}`)
+        // console.log(`${metric.name}: ${metric.value} - ${metric.timestamp}`)
         await metric.log()
       }
-      await metric.setTimestamp(timestamp)
     } else {
       metric = await EdgeDeviceMetric.create(
         this.id,
@@ -410,6 +410,7 @@ class EdgeDeviceMetric extends Model {
   }
   async getHistory() {
     let sql = `SELECT * FROM edgedevicemetrichistory WHERE edgedevicemetric=? AND timestamp > ?`
+    console.log(getUnixTime(new Date()))
     let params = [this.id, getUnixTime(new Date()) - 120]
     const result = await this.constructor.executeQuery(sql, params)
     return result

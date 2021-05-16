@@ -115,11 +115,9 @@ const start = async function (dbFilename) {
       // )
       let edgedevice = edgenode.findDeviceByName(name)
       if (edgedevice) {
-        await Promise.all(
-          payload.metrics.map((metric) => {
-            return edgedevice.createOrUpdateMetric(metric)
-          })
-        )
+        for (metric of payload.metrics) {
+          await edgedevice.createOrUpdateMetric(metric)
+        }
       } else {
         console.log(`Detected data for device that doesn't exist on node.`)
       }
