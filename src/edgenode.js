@@ -154,8 +154,8 @@ class EdgeDevice extends Model {
     })
     if (metric) {
       await metric.setDatatype(type)
+      // console.log(`${metric.name}: ${metric.value}`)
       if (metric.value !== value) {
-        console.log(`${metric.name}: ${metric.value}`)
         await metric.log()
       }
       await metric.setValue(value)
@@ -404,7 +404,6 @@ class EdgeDeviceMetric extends Model {
     let sql = `SELECT * FROM edgedevicemetrichistory WHERE edgedevicemetric=? AND timestamp > ?`
     let params = [this.id, getUnixTime(new Date()) - 300]
     const result = await this.constructor.executeQuery(sql, params)
-    console.log(result)
     return result
   }
   get edgedevice() {

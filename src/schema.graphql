@@ -25,6 +25,7 @@ type EdgeDeviceMetric {
   value: String
   timestamp: DateTime!
   createdOn: DateTime!
+  history: [EdgeDeviceMetricHistory!]!
 }
 
 type EdgeDeviceMetricHistory {
