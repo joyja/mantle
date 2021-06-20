@@ -268,5 +268,5 @@ module.exports = {
   deleteEthernetIP,
   createMqtt,
   updateMqtt,
-  deleteMqtt
+  deleteMqtt,
 }
