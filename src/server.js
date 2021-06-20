@@ -7,7 +7,7 @@ const express = require('express')
 const { ApolloServer, PubSub, gql } = require('apollo-server-express')
 const resolvers = require('./resolvers')
 const EdgeNode = require('./edgenode')
-const { executeQuery } = require('./database/model')
+const { Database } = require('./database')
 const fs = require('fs')
 const logger = require('./logger')
 const mqttClient = require('./mqtt')
@@ -32,22 +32,7 @@ const start = async function (dbFilename) {
   }
   let fileExisted = false
   // Create database
-  if (dbFilename === `:memory:`) {
-    db = new sqlite3.Database(`:memory:`, (error) => {
-      if (error) {
-        throw error
-      }
-    })
-  } else {
-    if (fs.existsSync(`${dir}/${dbFilename}.db`)) {
-      fileExisted = true
-    }
-    db = new sqlite3.cached.Database(`${dir}/${dbFilename}.db`, (error) => {
-      if (error) {
-        throw error
-      }
-    })
-  }
+  db = new Database(dbFilename, desiredUserVersion)
   const pubsub = new PubSub()
   graphqlServer = new ApolloServer({
     typeDefs: gql`
@@ -74,25 +59,9 @@ const start = async function (dbFilename) {
   await new Promise(async (resolve, reject) => {
     httpServer.listen(listenPort, listenHost, async () => {
       const context = graphqlServer.context()
-      await executeQuery(context.db, 'PRAGMA foreign_keys = ON', [], true)
-      const { user_version: userVersion } = await executeQuery(
-        context.db,
-        'PRAGMA user_version',
-        [],
-        true
-      )
-      if (
-        dbFilename !== ':memory:' &&
-        fileExisted &&
-        userVersion !== desiredUserVersion
-      ) {
-        fs.copyFileSync(
-          `${dir}/${dbFilename}.db`,
-          `${dir}/${dbFilename}-backup-${new Date().toISOString()}.db`
-        )
-      }
-      await EdgeNode.initialize(context.db, context.pubusub)
-      await context.db.get(`PRAGMA user_version = ${desiredUserVersion}`)
+      await db.init()
+      await EdgeNode.initialize(db, context.pubusub)
+      await db.setUserVersion(desiredUserVersion)
       resolve()
     })
   })

@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const sqlite3 = require('sqlite3')
-const { executeQuery } = require('../src/database/model')
+const { executeQuery } = require('../src/database/sqlite')
 
 async function createTestDb(user_version = 2) {
   const db = await new Promise((resolve, reject) => {
