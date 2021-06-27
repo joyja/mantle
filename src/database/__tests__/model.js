@@ -1,5 +1,5 @@
-jest.mock('../../logger')
-const logger = require('../../logger')
+jest.mock('winston')
+const logger = require('winston')
 const { createTestDb, deleteTestDb } = require('../../../test/db')
 const { executeQuery, executeUpdate, Model } = require('../../database')
 

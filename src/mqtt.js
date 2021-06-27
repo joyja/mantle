@@ -4,7 +4,7 @@ const sparkplugbpayload = sparkplug.get('spBv1.0')
 const EventEmitter = require('events')
 const util = require('util')
 const pako = require('pako')
-const logger = require('./logger')
+const logger = require('winston')
 const { isThisSecond } = require('date-fns')
 const { encodePayload } = require('sparkplug-payload/lib/sparkplugbpayload')
 

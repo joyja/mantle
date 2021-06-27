@@ -1,4 +1,4 @@
-const logger = require('../logger')
+const logger = require('winston')
 
 const executeQuery = function (db, sql, params = [], firstRowOnly = false) {
   if (process.env.TENTACLE_DEBUG) {
@@ -37,6 +37,41 @@ const executeUpdate = function (db, sql, params = []) {
       }
     })
   })
+}
+
+class Database {
+  constructor() {
+    if (dbFilename === `:memory:`) {
+      this.db = new sqlite3.Database(`:memory:`, (error) => {
+        if (error) {
+          throw error
+        }
+      })
+    } else {
+      if (fs.existsSync(`${dir}/${dbFilename}.db`)) {
+        fileExisted = true
+      }
+      this.db = new sqlite3.cached.Database(
+        `${dir}/${dbFilename}.db`,
+        (error) => {
+          if (error) {
+            throw error
+          }
+        }
+      )
+    }
+  }
+  executeUpdate(sql, params) {
+    return executeUpdate(this.db, sql, params).catch((error) => {
+      console.log(error)
+      logger.error(error.message, { message: `sql: ${sql}` })
+    })
+  }
+  executeQuery(sql, params, firstRowOnly) {
+    return executeQuery(this.db, sql, params, firstRowOnly).catch((error) => {
+      logger.error(error, { message: `sql: ${sql}` })
+    })
+  }
 }
 
 class Model {
@@ -236,5 +271,6 @@ class Model {
 module.exports = {
   executeQuery,
   executeUpdate,
+  Database,
   Model,
 }

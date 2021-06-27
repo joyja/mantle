@@ -9,7 +9,8 @@ const resolvers = require('./resolvers')
 const EdgeNode = require('./edgenode')
 const { executeQuery } = require('./database/model')
 const fs = require('fs')
-const logger = require('./logger')
+require('./logger')
+const logger = require('winston')
 const mqttClient = require('./mqtt')
 
 const desiredUserVersion = 1
