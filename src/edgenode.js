@@ -1,4 +1,4 @@
-const { Model } = require('./database')
+const { Model, postgresql } = require('./database')
 const getUnixTime = require('date-fns/getUnixTime')
 const fromUnixTime = require('date-fns/fromUnixTime')
 
@@ -161,12 +161,12 @@ class EdgeDevice extends Model {
       } else {
         isLoggable = value !== metric.value
       }
-      // if (isLoggable > parseInt(timestamp) - parseInt(metric.timestamp) > 10) {
-      //  console.log(
-      //    `old ${metric.name}: ${metric.value} - ${metric.timestamp} !== ${timestamp}`
-      //   )
-      await metric.log()
-      // }
+      if (isLoggable && parseInt(timestamp) - parseInt(metric.timestamp) > 10) {
+        console.log(
+          `old ${metric.name}: ${metric.value} - ${metric.timestamp} !== ${timestamp}`
+        )
+        await metric.log()
+      }
       await metric.setDatatype(type)
       await metric.setValue(value)
       await metric.setTimestamp(timestamp)
@@ -372,17 +372,19 @@ EdgeNodeInfo.fields = [
 ]
 
 class EdgeDeviceMetric extends Model {
+  static async initialize(db, pubsub) {
+    this.pgPool = postgresql.pool
+    return super.initialize(db, pubsub)
+  }
   static async createTable() {
     const result = await super.createTable()
     let sql = `CREATE TABLE IF NOT EXISTS "edgedevicemetrichistory" (`
-    sql = `${sql} "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE`
-    sql = `${sql}, "edgedevicemetric" INTEGER`
+    sql = `${sql} "edgedevicemetric" INTEGER`
     sql = `${sql}, "value" TEXT`
-    sql = `${sql}, "timestamp" INTEGER`
-    sql = `${sql}, FOREIGN KEY("edgedevicemetric") REFERENCES "edgedevicemetric"("id") ON DELETE CASCADE);`
-    await this.executeUpdate(sql)
-    sql = `CREATE INDEX IF NOT EXISTS idx_edgedevicemetrichistory_edgedevicemetric ON edgedevicemetrichistory (edgedevicemetric);`
-    await this.executeUpdate(sql)
+    sql = `${sql}, "timestamp" TIMESTAMPTZ)`
+    await this.pgPool.query(sql)
+    sql = `SELECT create_hypertable('edgedevicemetrichistory','timestamp',if_not_exists => TRUE)`
+    await this.pgPool.query(sql)
     return result
   }
   static create(edgedevice, name, description, datatype, value, timestamp) {
@@ -410,15 +412,20 @@ class EdgeDeviceMetric extends Model {
     this.stale = false
   }
   async log() {
-    let sql = `INSERT INTO edgedevicemetrichistory (edgedevicemetric, value, timestamp) VALUES (?, ?, ?)`
-    let params = [this.id, this.value, this.timestamp]
-    await this.constructor.executeUpdate(sql, params)
+    let sql = `INSERT INTO edgedevicemetrichistory (edgedevicemetric, value, timestamp) VALUES ($1, $2, $3)`
+    let params = [this.id, this.value, fromUnixTime(this.timestamp)]
+    await this.constructor.pgPool.query(sql, params)
   }
   async getHistory() {
-    let sql = `SELECT * FROM edgedevicemetrichistory WHERE edgedevicemetric=? AND timestamp > ?`
-    let params = [this.id, getUnixTime(new Date()) - 120]
-    const result = await this.constructor.executeQuery(sql, params)
-    return result
+    let sql = `SELECT * FROM edgedevicemetrichistory WHERE edgedevicemetric=$1 AND timestamp > $2`
+    let params = [this.id, fromUnixTime(getUnixTime(new Date()) - 120)]
+    const result = await this.constructor.pgPool.query(sql, params)
+    return result.rows.map((row) => {
+      return {
+        ...row,
+        timestamp: getUnixTime(row.timestamp),
+      }
+    })
   }
   get edgedevice() {
     this.checkInit()
