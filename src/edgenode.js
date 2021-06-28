@@ -161,12 +161,12 @@ class EdgeDevice extends Model {
       } else {
         isLoggable = value !== metric.value
       }
-      // if (isLoggable > parseInt(timestamp) - parseInt(metric.timestamp) > 10) {
-      //  console.log(
-      //    `old ${metric.name}: ${metric.value} - ${metric.timestamp} !== ${timestamp}`
-      //   )
-      await metric.log()
-      // }
+      if (isLoggable && parseInt(timestamp) - parseInt(metric.timestamp) > 10) {
+        console.log(
+          `old ${metric.name}: ${metric.value} - ${metric.timestamp} !== ${timestamp}`
+        )
+        await metric.log()
+      }
       await metric.setDatatype(type)
       await metric.setValue(value)
       await metric.setTimestamp(timestamp)
@@ -417,10 +417,15 @@ class EdgeDeviceMetric extends Model {
     await this.constructor.pgPool.query(sql, params)
   }
   async getHistory() {
-    let sql = `SELECT * FROM edgedevicemetrichistory WHERE edgedevicemetric=? AND timestamp > $1`
-    let params = [this.id, getUnixTime(new Date()) - 120]
+    let sql = `SELECT * FROM edgedevicemetrichistory WHERE edgedevicemetric=$1 AND timestamp > $2`
+    let params = [this.id, fromUnixTime(getUnixTime(new Date()) - 120)]
     const result = await this.constructor.pgPool.query(sql, params)
-    return result
+    return result.rows.map((row) => {
+      return {
+        ...row,
+        timestamp: getUnixTime(row.timestamp),
+      }
+    })
   }
   get edgedevice() {
     this.checkInit()
