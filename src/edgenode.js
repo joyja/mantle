@@ -162,6 +162,8 @@ class EdgeDevice extends Model {
         isLoggable = value !== metric.value
       }
       if (isLoggable && parseInt(timestamp) - parseInt(metric.timestamp) > 10) {
+        console.log(timestamp)
+        console.log(metric.timestamp)
         console.log(
           `old ${metric.name}: ${metric.value} - ${metric.timestamp} !== ${timestamp}`
         )
