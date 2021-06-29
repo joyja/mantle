@@ -113,6 +113,7 @@ const start = async function (dbFilename) {
     password: mqttenv.password,
     primaryHostId: mqttenv.primaryHostId,
   })
+  console.log(mqtt.serverUrl)
 
   mqtt.on('ddata', async ({ topic, groupId, node, name, payload }) => {
     let edgenode = EdgeNode.findByGroupIdAndName(groupId, node)
