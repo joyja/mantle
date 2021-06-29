@@ -97,15 +97,21 @@ const start = async function (dbFilename) {
       resolve()
     })
   })
-
+  const mqttenv = {
+    encrypt: process.env.MANTLE_MQTTENCRYPT || false,
+    host: process.env.MANTLE_MQTTHOST || 'localhost',
+    port: process.env.MANTLE_MQTTPORT || 1883,
+    username: process.env.MANTLE_MQTTUSERNAME,
+    password: process.env.MANTLE_MQTTPASSWORD,
+    primaryHostId: process.env.MANTLE_MQTTPRIMARYHOSTID,
+  }
   const mqtt = new mqttClient({
-    serverUrl:
-      process.env.NODE_ENV === 'production'
-        ? 'tcp://mosquitto-1.lxd:1883'
-        : 'ssl://mosquitto.jarautomation.io:37010',
-    username: 'joyja',
-    password: 'pLLJtj1txGZ4JdrrF2OS',
-    primaryHostId: `mantle1`,
+    serverUrl: `${mqttenv.encrypt ? 'ssl' : 'tcp'}://${mqttenv.host}:${
+      mqttenv.port
+    }`,
+    username: mqttenv.username,
+    password: mqttenv.password,
+    primaryHostId: mqttenv.primaryHostId,
   })
 
   mqtt.on('ddata', async ({ topic, groupId, node, name, payload }) => {
