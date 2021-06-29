@@ -98,7 +98,7 @@ const start = async function (dbFilename) {
     })
   })
   const mqttenv = {
-    encrypt: process.env.MANTLE_MQTTENCRYPT || false,
+    encrypt: process.env.MANTLE_MQTTENCRYPT === 'true' || false,
     host: process.env.MANTLE_MQTTHOST || 'localhost',
     port: process.env.MANTLE_MQTTPORT || 1883,
     username: process.env.MANTLE_MQTTUSERNAME,
