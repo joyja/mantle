@@ -165,6 +165,7 @@ class EdgeDevice extends Model {
         console.log(
           `old ${metric.name}: ${metric.value} - ${metric.timestamp} !== ${timestamp}`
         )
+        await metric.setTimestamp(timestamp)
         await metric.log()
       }
       await metric.setDatatype(type)
