@@ -6,9 +6,9 @@ const pool = new Pool({
   database: process.env.MANTLE_PGDATABASE,
   password: process.env.MANTLE_PGPASSWORD,
   port: process.env.MANTLE_PGPORT,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  // ssl: {
+  //   rejectUnauthorized: false,
+  // },
 })
 
 module.exports = {

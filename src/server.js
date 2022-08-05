@@ -49,7 +49,7 @@ const start = async function (dbFilename) {
       }
     })
   }
-  const pubsub = new PubSub()
+  const pubsub = null //new PubSub()
   graphqlServer = new ApolloServer({
     typeDefs: gql`
       ${fs.readFileSync(__dirname.concat('/schema.graphql'), 'utf8')}
@@ -67,13 +67,14 @@ const start = async function (dbFilename) {
     introspection: true,
     playground: true,
   })
-  graphqlServer.applyMiddleware({ app, path: '/' })
 
   httpServer = http.createServer(app)
-  graphqlServer.installSubscriptionHandlers(httpServer)
+  // graphqlServer.installSubscriptionHandlers(httpServer)
 
   await new Promise(async (resolve, reject) => {
     httpServer.listen(listenPort, listenHost, async () => {
+      await graphqlServer.start()
+      graphqlServer.applyMiddleware({ app, path: '/' })
       const context = graphqlServer.context()
       await executeQuery(context.db, 'PRAGMA foreign_keys = ON', [], true)
       const { user_version: userVersion } = await executeQuery(
