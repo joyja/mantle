@@ -155,6 +155,7 @@ const start = async function (dbFilename) {
       edgenode.addOrUpdateDevice(name, payload)
     } else {
       console.log(`Detected device birth for node that doesn't exist.`)
+      mqtt.publishRebirthCommand(groupId, node)
     }
     // console.log(topic)
     // console.log(groupId)

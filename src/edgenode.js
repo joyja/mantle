@@ -172,7 +172,7 @@ class EdgeDevice extends Model {
       await metric.setValue(value)
       await metric.setTimestamp(timestamp)
       if (isLoggable) {
-        console.log(`new ${metric.name}: ${metric.value} - ${metric.timestamp}`)
+        // console.log(`new ${metric.name}: ${metric.value} - ${metric.timestamp}`)
         await metric.log()
       }
     } else {

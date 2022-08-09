@@ -5,7 +5,7 @@ const EventEmitter = require('events')
 const util = require('util')
 const pako = require('pako')
 const logger = require('winston')
-const { isThisSecond } = require('date-fns')
+const { isThisSecond, getUnixTime } = require('date-fns')
 const { encodePayload } = require('sparkplug-payload/lib/sparkplugbpayload')
 
 const compressed = 'SBV1.0_COMPRESSED'
@@ -180,6 +180,8 @@ class MqttClient extends EventEmitter {
           payload,
         })
       } else {
+        console.log(topic)
+        console.log(payload)
         logger.info(`Message received on unknown topic ${topic}`)
       }
     })
@@ -287,6 +289,24 @@ class MqttClient extends EventEmitter {
     logger.info('Publish Primary Host Offline.')
     this.client.publish(topic, payload, { retain: true })
     this.messageAlert('published', topic, payload)
+  }
+  publishRebirthCommand(group, node) {
+    const topic = `${this.version}/${group}/NCMD/${node}`
+    const payload = {
+      metrics: [
+        {
+          name: 'Node Control/Rebirth',
+          type: 'Boolean',
+          value: true,
+          timestamp: getUnixTime(new Date()),
+        },
+      ],
+      timestamp: getUnixTime(new Date()),
+    }
+    this.client.publish(
+      topic,
+      this.encodePayload(this.maybeCompressPayload(payload, options))
+    )
   }
   stop() {
     this.publishHostOffline()
