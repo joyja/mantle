@@ -1,6 +1,18 @@
 """Used to deliver timestamp values."""
 scalar DateTime
 
+type User {
+  id: ID!
+  username: String!
+}
+
+type AuthPayload {
+  """Bearer token to be added to the Authorization header for future requests."""
+  token: String
+  """User that successfully logged in."""
+  user: User
+}
+
 type EdgeNode {
   group: String!
   name: String!
@@ -41,5 +53,10 @@ type Query {
 }
 
 type Mutation {
+  """If a valid username and password is provided, this will return an auth payload with a java web token to be used for future requests 
+  and information about the user that successfully logged in."""
+  login(username: String!, password: String!): AuthPayload
+  """Allows the user to change their password"""
+  changePassword(oldPassword: String!, newPassword: String!): User
   edgeDeviceMetricHistory(nodeName: String!, deviceName: String!, metricName: String!): [EdgeDeviceMetricHistory!]!
 }

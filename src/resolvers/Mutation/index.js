@@ -1,3 +1,5 @@
+const { login, changePassword } = require('./auth')
+
 const edgeDeviceMetricHistory = async function (root, args, context, info) {
   const node = context.EdgeNodes.find((instance) => {
     return instance.name === args.nodeName
@@ -26,5 +28,7 @@ const edgeDeviceMetricHistory = async function (root, args, context, info) {
 }
 
 module.exports = {
+  login,
+  changePassword,
   edgeDeviceMetricHistory,
 }

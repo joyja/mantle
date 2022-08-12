@@ -1,4 +1,7 @@
+const { User } = require('../../auth')
+
 const edgeNodes = async function (root, args, context, info) {
+  const user = await User.getUserFromContext(context)
   return context.EdgeNodes
 }
 

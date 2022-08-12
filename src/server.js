@@ -4,9 +4,13 @@ const http = require('http')
 const path = require('path')
 const sqlite3 = require('sqlite3').verbose()
 const express = require('express')
+const {
+  ApolloServerPluginLandingPageLocalDefault,
+} = require('apollo-server-core')
 const { ApolloServer, PubSub, gql } = require('apollo-server-express')
 const resolvers = require('./resolvers')
 const EdgeNode = require('./edgenode')
+const { User } = require('./auth')
 const { executeQuery } = require('./database/model')
 const fs = require('fs')
 require('./logger')
@@ -22,7 +26,7 @@ app.use(express.json())
 let db = undefined
 let httpServer = undefined
 let graphqlServer = undefined
-let listenHost = process.env.MANTLE_HOST || 'localhost'
+let listenHost = process.env.MANTLE_HOST || '0.0.0.0'
 let listenPort = process.env.MANTLE_PORT || 4000
 
 const start = async function (dbFilename) {
@@ -65,7 +69,7 @@ const start = async function (dbFilename) {
       db,
     }),
     introspection: true,
-    playground: true,
+    plugins: [ApolloServerPluginLandingPageLocalDefault({ embed: true })],
   })
 
   httpServer = http.createServer(app)
@@ -94,6 +98,7 @@ const start = async function (dbFilename) {
         )
       }
       await EdgeNode.initialize(context.db, context.pubusub)
+      await User.initialize(context.db, context.pubsub)
       await context.db.get(`PRAGMA user_version = ${desiredUserVersion}`)
       resolve()
     })
