@@ -381,6 +381,7 @@ class EdgeDeviceMetric extends Model {
     const result = await super.createTable()
     let sql = `CREATE TABLE IF NOT EXISTS "edgedevicemetrichistory" (`
     sql = `${sql} "edgedevicemetric" INTEGER`
+    sql = `${sql} "name" TEXT`
     sql = `${sql}, "value" TEXT`
     sql = `${sql}, "timestamp" TIMESTAMPTZ)`
     await this.pgPool.query(sql)
@@ -413,8 +414,8 @@ class EdgeDeviceMetric extends Model {
     this.stale = false
   }
   async log() {
-    let sql = `INSERT INTO edgedevicemetrichistory (edgedevicemetric, value, timestamp) VALUES ($1, $2, $3)`
-    let params = [this.id, this.value, fromUnixTime(this.timestamp)]
+    let sql = `INSERT INTO edgedevicemetrichistory (edgedevicemetric, name, value, timestamp) VALUES ($1, $2, $3, $4)`
+    let params = [this.id, this.name, this.value, fromUnixTime(this.timestamp)]
     await this.constructor.pgPool.query(sql, params)
   }
   async getHistory() {
