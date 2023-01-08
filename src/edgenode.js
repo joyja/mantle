@@ -381,7 +381,7 @@ class EdgeDeviceMetric extends Model {
     const result = await super.createTable()
     let sql = `CREATE TABLE IF NOT EXISTS "edgedevicemetrichistory" (`
     sql = `${sql} "edgedevicemetric" INTEGER`
-    sql = `${sql} "name" TEXT`
+    sql = `${sql}, "name" TEXT`
     sql = `${sql}, "value" TEXT`
     sql = `${sql}, "timestamp" TIMESTAMPTZ)`
     await this.pgPool.query(sql)
